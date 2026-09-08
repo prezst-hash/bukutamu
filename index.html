@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buku Tamu Digital</title>
+  <style>
+    /* Mengatur tampilan agar rapi dan berada di tengah */
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f3f4f6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-top: 0;
+    }
+    input, textarea {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      box-sizing: border-box;
+      font-family: inherit;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      background-color: #2563eb;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 16px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    button:hover {
+      background-color: #1d4ed8;
+    }
+    button:disabled {
+      background-color: #93c5fd;
+      cursor: not-allowed;
+    }
+    /* Notifikasi sukses yang disembunyikan di awal */
+    .alert-success {
+      display: none;
+      background-color: #d1fae5;
+      color: #065f46;
+      padding: 15px;
+      border-radius: 6px;
+      margin-bottom: 15px;
+      text-align: center;
+      font-weight: 500;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Isi Buku Tamu</h2>
+    
+    <!-- Kotak notifikasi sukses -->
+    <div id="pesanSukses" class="alert-success">
+      Terima kasih! Pesan Anda telah tersimpan.
+    </div>
+
+    <!-- Form Input Data -->
+    <form id="bukuTamuForm">
+      <input type="text" name="nama" placeholder="Nama Lengkap" required>
+      <input type="email" name="email" placeholder="Alamat Email" required>
+      <textarea name="pesan" placeholder="Tulis pesan Anda di sini..." rows="4" required></textarea>
+      
+      <button type="submit" id="tombolKirim">Kirim Sekarang</button>
+    </form>
+  </div>
+
+  <script>
+    // MASUKKAN URL GOOGLE SCRIPT ANDA DI SINI
+    const scriptURL = 'https://script.google.com/macros/s/AKfycbwZk63a6LtbX4Y6UoNgbVdkx4Ajk9PTzLMdMGTxMA7Ft5kW4dDGgNregzPSXrjWH4A/exec'; 
+    
+    const form = document.getElementById('bukuTamuForm');
+    const tombolKirim = document.getElementById('tombolKirim');
+    const pesanSukses = document.getElementById('pesanSukses');
+
+    form.addEventListener('submit', e => {
+      e.preventDefault(); // Mencegah halaman reload
+      
+      // Ubah tombol jadi loading
+      tombolKirim.innerHTML = 'Mengirim Data...';
+      tombolKirim.disabled = true;
+
+      // Proses kirim data ke Google Sheets via Fetch API
+      fetch(scriptURL, { method: 'POST', body: new FormData(form)})
+        .then(response => {
+          // Jika sukses
+          pesanSukses.style.display = 'block'; // Tampilkan notifikasi
+          form.reset(); // Kosongkan isian form
+          tombolKirim.innerHTML = 'Kirim Sekarang'; // Kembalikan teks tombol
+          tombolKirim.disabled = false; // Aktifkan tombol lagi
+          
+          // Hilangkan notifikasi setelah 5 detik
+          setTimeout(() => {
+            pesanSukses.style.display = 'none';
+          }, 5000);
+        })
+        .catch(error => {
+          // Jika error
+          alert('Gagal mengirim data: ' + error.message);
+          tombolKirim.innerHTML = 'Kirim Sekarang';
+          tombolKirim.disabled = false;
+        });
+    });
+  </script>
+
+</body>
+</html>
